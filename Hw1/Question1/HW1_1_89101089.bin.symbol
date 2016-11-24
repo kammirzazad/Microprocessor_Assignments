@@ -1,0 +1,19 @@
+< THE SYMBOL TABLE >  HW1_1_89101089.bin  --  emu8086 assembler version: 4.08 
+===================================================================================================
+Name                     	Offset    	Size      	Type      	Segment   
+===================================================================================================
+CODE                     	00000     	-5        	SEGMENT   	(ITSELF)  
+START                    	00000     	-1        	LABEL     	code      
+CHECKREC                 	0000C     	-1        	LABEL     	code      
+REC_RATE_8               	00018     	-1        	LABEL     	code      
+REC_RATE_12              	00027     	-1        	LABEL     	code      
+RECORD                   	00036     	-1        	LABEL     	code      
+CHECKPUL1                	0003D     	-1        	LABEL     	code      
+CHECKEOC                 	0004F     	-1        	LABEL     	code      
+CHECKPLY                 	00060     	-1        	LABEL     	code      
+PLAY                     	00066     	-1        	LABEL     	code      
+CHECKPUL2                	0006C     	-1        	LABEL     	code      
+===================================================================================================
+[ 09.04.2013  --  20:04:11 ] 
+< END >
+ 

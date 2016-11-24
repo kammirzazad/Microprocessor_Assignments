@@ -1,0 +1,23 @@
+< THE SYMBOL TABLE >  HW2_1.exe  --  emu8086 assembler version: 4.08 
+===================================================================================================
+Name                     	Offset    	Size      	Type      	Segment   
+===================================================================================================
+DATA                     	00000     	-5        	SEGMENT   	(ITSELF)  
+GUESS_MIN                	00000     	1         	VAR       	DATA      
+GUESS_MAX                	00001     	1         	VAR       	DATA      
+GUESS_BIN                	00002     	1         	VAR       	DATA      
+GUESS_ASC                	00003     	1         	VAR       	DATA      
+INPUT                    	00007     	1         	VAR       	DATA      
+MESS1                    	00008     	1         	VAR       	DATA      
+MESS2                    	00038     	1         	VAR       	DATA      
+MESS3                    	00056     	1         	VAR       	DATA      
+STACK                    	00007     	-5        	SEGMENT   	(ITSELF)  
+TOP                      	00064     	-1        	LABEL     	STACK     
+CODE                     	0000E     	-5        	SEGMENT   	(ITSELF)  
+START                    	0000A     	-1        	LABEL     	CODE      
+MATCH                    	00048     	-1        	LABEL     	CODE      
+CAL_PRINT                	00050     	-1        	NEAR      	CODE      
+===================================================================================================
+[ 29.03.2013  --  17:31:24 ] 
+< END >
+ 

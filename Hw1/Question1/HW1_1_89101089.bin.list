@@ -1,0 +1,157 @@
+EMU8086 GENERATED LISTING. MACHINE CODE <- SOURCE.
+ 
+HW1_1_89101089.bin -- emu8086 assembler version: 4.08  
+ 
+[ 09.04.2013  --  20:04:11 ] 
+ 
+===================================================================================================
+[LINE]     LOC: MACHINE CODE                          SOURCE
+===================================================================================================
+ 
+[   1]        :                                       ;
+[   2]        :                                       ;
+[   3]        :                                       ;
+[   4]        :                                       ;
+[   5]        :                                       ;   8086 is operating with 6 MHZ clock
+[   6]        :                                       ;   0808 is used as A/D converter that interfaces through PortA of 8255
+[   7]        :                                       ; AD7523 is used as D/A converter that interfaces through PortB of 8255
+[   8]        :                                       ;   Timer0 of 8254 is used in Mode2 (pulse generator)
+[   9]        :                                       ;   Gate input of timer is tied to high
+[  10]        :                                       ;   64 KByte extra memory is mapped at 40000H-4FFFFH
+[  11]        :                                       ;
+[  12]        :                                       
+[  13]        :                                       PortADC   EQU 10H ; PortA Input
+[  14]        :                                       PortDAC   EQU 11H ; PortB Output
+[  15]        :                                       PortSig   EQU 12H ; Upper Part of PortC is used as input / Lower Part as output
+[  16]        :                                       PortCon   EQU 13H
+[  17]        :                                       
+[  18]        :                                       Timer0    EQU 40H
+[  19]        :                                       ;Timer1   is unused
+[  20]        :                                       ;Timer2   is unused
+[  21]        :                                       TimerCon  EQU 43H
+[  22]        :                                       
+[  23]        :                                       ;port definitions
+[  24]        :                                       ;
+[  25]        :                                       ;PortSig [7] : button
+[  26]        :                                       ;PortSig [6] : switch                                             Upper Part of PortC ( Input  )
+[  27]        :                                       ;PortSig [5] : timer 0 out
+[  28]        :                                       ;PortSig [4] : ADC end of conversion (EOC)
+[  29]        :                                       ;
+[  30]        :                                       ;
+[  31]        :                                       ;PortSig [3] : Led                                   Lower Part of PortC ( Output )
+[  32]        :                                       ;PortSig [2] : -
+[  33]        :                                       ;PortSig [1] : -
+[  34]        :                                       ;PortSig [0] : ADC start of conversion (SOC)
+[  35]        :                                       
+[  36]        :                                       
+[  37]        :                                       But_Mask  EQU 10000000B
+[  38]        :                                       Swh_Mask  EQU 01000000B
+[  39]        :                                       Tim_Mask  EQU 00100000B
+[  40]        :                                       ADC_Mask  EQU 00010000B
+[  41]        :                                       
+[  42]        :                                       LED_on    EQU 00000111B
+[  43]        :                                       LED_off   EQU 00000110B
+[  44]        :                                       ADC_on    EQU 00000001B
+[  45]        :                                       ADC_off   EQU 00000000B
+[  46]        :                                       
+[  47]        :                                       
+[  48]        :                                       
+[  49]        :                                       code         SEGMENT
+[  50]        :                                       
+[  51]        :                                       ASSUME CS:code  ES:4000H
+[  52]        :                                       
+[  53]        :                                       
+[  54]        :                                       
+[  55]        :                                       ;initialize ports
+[  56]    0000: B0 98                                 Start: MOV  AL       , 98H        ; initialize 8255 PPI (A and upper C is input , B and lower C is output)
+[  57]    0002: E6 13                                 OUT  PortCon  , AL
+[  58]    0004: B8 00 40                              MOV  AX       , 4000H      ; initialize extra segment base
+[  59]    0007: 8E C0                                 MOV  ES       , AX
+[  60]    0009: BF 00 00                              MOV  DI       , 0000H      ; initialize DI to first byte of memory
+[  61]        :                                       
+[  62]    000C: E4 12                                 CheckREC: IN   AL       , PortSig
+[  63]    000E: A8 80                                 TEST AL       , But_Mask
+[  64]    0010: 74 FA                                 JZ   CheckREC              ; check record request
+[  65]    0012: A8 FD                                 TEST AL       , 0FDH
+[  66]    0014: 74 02                                 JZ   Rec_Rate_8            ; initialize timer 0 to  8 KHZ
+[  67]    0016: EB 0F                                 JMP  Rec_Rate_12           ; initialize timer 0 to 12 KHZ
+[  68]        :                                       
+[  69]        :                                       
+[  70]    0018: B0 35                                 Rec_Rate_8: MOV  AL       , 00110101B  ; select timer 0 to r/w LSB first , then MSB  in mode 2 as 16 bit binary counter
+[  71]    001A: E6 43                                 OUT  TimerCon , AL
+[  72]    001C: B8 EE 02                              MOV  AX       , 750        ; 6000/ 8=750
+[  73]    001F: E6 40                                 OUT  Timer0   , AL         ; out least significant byte
+[  74]    0021: 8A C4                                 MOV  AL       , AH
+[  75]    0023: E6 40                                 OUT  Timer0   , AL         ; out  most significant byte
+[  76]    0025: EB 0F                                 JMP  Record
+[  77]        :                                       
+[  78]        :                                       
+[  79]    0027: B0 35                                 Rec_Rate_12: MOV  AL       , 00110101B  ; select timer 0 to r/w LSB first , then MSB  in mode 2 as 16 bit binary counter
+[  80]    0029: E6 43                                 OUT  TimerCon , AL
+[  81]    002B: B8 F4 01                              MOV  AX       , 500        ; 6000/12=500
+[  82]    002E: E6 40                                 OUT  Timer0   , AL         ; out least significant byte
+[  83]    0030: 8A C4                                 MOV  AL       , AH
+[  84]    0032: E6 40                                 OUT  Timer0   , AL         ; out  most significant byte
+[  85]    0034: EB 00                                 JMP  Record
+[  86]        :                                       
+[  87]        :                                       
+[  88]    0036: B0 07                                 Record: MOV  AL      , LED_on      ; turn on led
+[  89]    0038: E6 13                                 OUT  PortCon , AL          ;   set corresponding bit in PortC
+[  90]    003A: B9 FF FF                              MOV  CX      , 0FFFFH      ; initialize CX to read 64KByte
+[  91]        :                                       
+[  92]    003D: E4 12                                 CheckPUL1: IN   AL      , PortSig
+[  93]    003F: 24 20                                 AND  AL      , Tim_Mask    ;  mask timer out
+[  94]    0041: 75 FA                                 JNZ  CheckPUL1             ; check timer out
+[  95]        :                                       
+[  96]    0043: B0 00                                 MOV  AL      , ADC_off     ; generate pulse to start conversion
+[  97]    0045: E6 13                                 OUT  PortCon , AL          ; reset corresponding bit in PortC
+[  98]    0047: B0 01                                 MOV  AL      , ADC_on
+[  99]    0049: E6 13                                 OUT  PortCon , AL          ;   set corresponding bit in PortC
+[ 100]    004B: B0 00                                 MOV  AL      , ADC_off
+[ 101]    004D: E6 13                                 OUT  PortCon , AL          ; reset corresponding bit in PortC
+[ 102]        :                                       
+[ 103]    004F: E4 12                                 CheckEOC: IN   AL      , PortSig
+[ 104]    0051: 24 10                                 AND  AL      , ADC_Mask    ;  mask end of conversion (ADC)
+[ 105]    0053: 74 FA                                 JZ   CheckEOC              ; check end of conversion (ADC)
+[ 106]        :                                       
+[ 107]    0055: E4 10                                 IN   AL      , PortADC     ; read value from port
+[ 108]    0057: 88 05                                 MOV  [DI]    , AL          ; store read value in memory
+[ 109]    0059: 47                                    INC  DI                    ; move DI to next byte
+[ 110]    005A: E2 E1                                 LOOP CheckPUL1             ; repeat until 64KByte is read
+[ 111]        :                                       
+[ 112]    005C: B0 06                                 MOV  AL      , LED_off     ; turn off led
+[ 113]    005E: E6 13                                 OUT  PortCon , AL          ; reset corresponding bit in PortC
+[ 114]        :                                       
+[ 115]    0060: E4 12                                 CheckPLY: IN   AL      , PortSig
+[ 116]    0062: A8 80                                 TEST AL      , But_Mask
+[ 117]    0064: 74 FA                                 JZ   CheckPLY              ; check play request
+[ 118]        :                                       
+[ 119]        :                                       
+[ 120]    0066: B9 FF FF                              Play: MOV  CX      , 0FFFFH      ; initialize CX to move play 64KByte from memory
+[ 121]    0069: BF 00 00                              MOV  DI      , 0000H       ; initialize DI to first byte of memory
+[ 122]        :                                       ; timer is generating pulse with selected rate so there
+[ 123]        :                                       ; is no need to reinitialize it
+[ 124]        :                                       
+[ 125]    006C: E4 12                                 CheckPUL2: IN   AL      , PortSig
+[ 126]    006E: 24 20                                 AND  AL      , Tim_Mask    ; mask  timer out
+[ 127]    0070: 75 FA                                 JNZ  CheckPUL2             ; check timer out
+[ 128]        :                                       
+[ 129]    0072: 8A 05                                 MOV  AL      , [DI]        ; read value from memory
+[ 130]    0074: E6 11                                 OUT  PortDAC , AL          ; send value to port
+[ 131]    0076: 47                                    INC  DI                    ; move DI to next byte
+[ 132]    0077: E2 F3                                 LOOP CheckPUL2             ; repeat until 64KByte is played
+[ 133]        :                                       
+[ 134]    0079: EB 85                                 JMP  Start
+[ 135]        :                                       
+[ 136]        :                                       code         ENDS
+[ 137]        :                                       
+[ 138]        :                                       END
+[ 139]        :                                       
+ 
+===================================================================================================
+ 
+
+
+
+
+===================================================================================================

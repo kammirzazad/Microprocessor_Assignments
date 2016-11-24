@@ -1,0 +1,126 @@
+
+
+DATA   SEGMENT
+
+Guess_MIN DB 0
+Guess_MAX DB 255
+Guess_BIN DB 128
+Guess_ASC DB 3 DUP(?) , '$'
+
+Input     DB ?
+
+MESS1     DB 0DH,0AH,'Enter Statement: (l:less , e:equal , m:major)$'
+MESS2     DB 0DH,0AH,'Error: Unexpected statement$'
+MESS3     DB 0DH,0AH,'Value Found!$'
+
+DATA   ENDS
+
+
+STACK  SEGMENT STACK
+
+DW 50 DUP(?)
+TOP  Label Word
+
+STACK  ENDS
+
+
+CODE   SEGMENT
+
+ASSUME CS:CODE , DS:DATA , SS:STACK
+
+MOV AX , DATA
+MOV DS , AX
+MOV AX , STACK
+MOV DS , AX
+
+START: MOV AL , Guess_MIN
+ADD AL , Guess_MAX
+SUB AH , AH
+MOV BL , 02H
+
+DIV BL
+
+MOV Guess_BIN , AL
+
+CALL CAL_PRINT
+
+MOV DX , offset MESS1
+MOV AH , 09H
+INT 21H
+
+MOV AH , 01H
+INT 21H
+
+CMP AL , 'e'
+JE  Match
+
+CMP AL , 'l'
+MOV AL , Guess_BIN
+MOV Guess_MAX , AL
+JMP START
+
+CMP AL , 'm'
+MOV AL , Guess_BIN
+MOV Guess_MIN , AL
+JMP START
+
+MOV DX , offset MESS2
+MOV AH , 09H
+INT 21H
+HLT
+
+Match: MOV DX , offset MESS3
+MOV AH , 09H
+INT 21H
+HLT
+
+
+
+CAL_PRINT PROC NEAR
+
+; AH=0 AL=213
+
+SUB AH , AH
+MOV AL , Guess_BIN
+MOV BL , 10
+DIV BL                  ; AL contaisn Guess_BIN / 10
+MOV Guess_ASC[2] , AH   ; AH contains Guess_BIN % 10
+
+; AH=3 AL=21
+
+SUB AH , AH
+MOV BL , 10
+DIV BL                  ; AL contains ( Guess_BIN/10 ) / 10
+MOV Guess_ASC[1] , AH   ; AH contains ( Guess_BIN/10 ) % 10
+
+; AH=1 AL=2
+
+SUB AH , AH
+MOV AL , Guess_BIN
+MOV BL , 100
+DIV BL                  ; AL contains ( ( Guess_BIN/10 ) / 10 ) / 10
+MOV Guess_ASC[0] , AH   ; AH contains ( ( Guess_BIN/10 ) / 10 ) % 10
+
+; AH=2 AL=0
+
+ADD Guess_ASC[2] , 30H
+ADD Guess_ASC[1] , 30H
+ADD Guess_ASC[0] , 30H
+
+MOV DX , offset Guess_ASC
+MOV AH , 09H
+INT 21H
+
+RET
+
+CAL_PRINT ENDP
+
+
+
+CODE ENDS
+
+END START
+
+
+
+; [SOURCE]: C:\Users\Mirza Zad\Documents\My Files\University Files\EE Faculty\MicroProcessor Systems Spring 91-92\HomeWorks\Hw2\HW2_1.asm

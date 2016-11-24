@@ -1,0 +1,197 @@
+EMU8086 GENERATED LISTING. MACHINE CODE <- SOURCE.
+ 
+HW2_1.exe -- emu8086 assembler version: 4.08  
+ 
+[ 29.03.2013  --  17:31:24 ] 
+ 
+===================================================================================================
+[LINE]     LOC: MACHINE CODE                          SOURCE
+===================================================================================================
+ 
+[   1]        :                                       
+[   2]        :                                       
+[   3]        :                                       DATA   SEGMENT
+[   4]        :                                       
+[   5]    0000: 00                                    Guess_MIN DB 0
+[   6]    0001: FF                                    Guess_MAX DB 255
+[   7]    0002: 80                                    Guess_BIN DB 128
+[   8]    0003: 00 00 00 24                           Guess_ASC DB 3 DUP(?) , '$'
+[   9]        :                                       
+[  10]    0007: 00                                    Input     DB ?
+[  11]        :                                       
+[  12]    0008: 0D 0A 45 6E 74 65 72 20 53 74 61 74   MESS1     DB 0DH,0AH,'Enter Statement: (l:less , e:equal , m:major)$'
+                65 6D 65 6E 74 3A 20 28 6C 3A 6C 65 
+                73 73 20 2C 20 65 3A 65 71 75 61 6C 
+                20 2C 20 6D 3A 6D 61 6A 6F 72 29 24 
+                                                    
+[  13]    0038: 0D 0A 45 72 72 6F 72 3A 20 55 6E 65   MESS2     DB 0DH,0AH,'Error: Unexpected statement$'
+                78 70 65 63 74 65 64 20 73 74 61 74 
+                65 6D 65 6E 74 24                   
+[  14]    0056: 0D 0A 56 61 6C 75 65 20 46 6F 75 6E   MESS3     DB 0DH,0AH,'Value Found!$'
+                64 21 24                            
+[  15]        :                                       
+[  16]        :                                       DATA   ENDS
+[  17]        :                                       
+[  18]        :                                       
+[  19]        :                                       STACK  SEGMENT STACK
+[  20]        :                                       
+[  21]    0070: 00 00 00 00 00 00 00 00 00 00 00 00   DW 50 DUP(?)
+                00 00 00 00 00 00 00 00 00 00 00 00 
+                00 00 00 00 00 00 00 00 00 00 00 00 
+                00 00 00 00 00 00 00 00 00 00 00 00 
+                00 00 00 00 00 00 00 00 00 00 00 00 
+                00 00 00 00 00 00 00 00 00 00 00 00 
+                00 00 00 00 00 00 00 00 00 00 00 00 
+                00 00 00 00 00 00 00 00 00 00 00 00 
+                00 00 00 00                         
+[  22]    00D4:                                       TOP  Label Word
+[  23]        :                                       
+[  24]        :                                       STACK  ENDS
+[  25]        :                                       
+[  26]        :                                       
+[  27]        :                                       CODE   SEGMENT
+[  28]        :                                       
+[  29]        :                                       ASSUME CS:CODE , DS:DATA , SS:STACK
+[  30]        :                                       
+[  31]    00E0: B8 00 00                              MOV AX , DATA
+[  32]    00E3: 8E D8                                 MOV DS , AX
+[  33]    00E5: B8 07 00                              MOV AX , STACK
+[  34]    00E8: 8E D8                                 MOV DS , AX
+[  35]        :                                       
+[  36]    00EA: A0 00 00                              START: MOV AL , Guess_MIN
+[  37]    00ED: 02 06 01 00                           ADD AL , Guess_MAX
+[  38]    00F1: 2A E4                                 SUB AH , AH
+[  39]    00F3: B3 02                                 MOV BL , 02H
+[  40]        :                                       
+[  41]    00F5: F6 F3                                 DIV BL
+[  42]        :                                       
+[  43]    00F7: A2 02 00                              MOV Guess_BIN , AL
+[  44]        :                                       
+[  45]    00FA: E8 33 00                              CALL CAL_PRINT
+[  46]        :                                       
+[  47]    00FD: BA 08 00                              MOV DX , offset MESS1
+[  48]    0100: B4 09                                 MOV AH , 09H
+[  49]    0102: CD 21                                 INT 21H
+[  50]        :                                       
+[  51]    0104: B4 01                                 MOV AH , 01H
+[  52]    0106: CD 21                                 INT 21H
+[  53]        :                                       
+[  54]    0108: 3C 65                                 CMP AL , 'e'
+[  55]    010A: 74 1C                                 JE  Match
+[  56]        :                                       
+[  57]    010C: 3C 6C                                 CMP AL , 'l'
+[  58]    010E: A0 02 00                              MOV AL , Guess_BIN
+[  59]    0111: A2 01 00                              MOV Guess_MAX , AL
+[  60]    0114: EB D4                                 JMP START
+[  61]        :                                       
+[  62]    0116: 3C 6D                                 CMP AL , 'm'
+[  63]    0118: A0 02 00                              MOV AL , Guess_BIN
+[  64]    011B: A2 00 00                              MOV Guess_MIN , AL
+[  65]    011E: EB CA                                 JMP START
+[  66]        :                                       
+[  67]    0120: BA 38 00                              MOV DX , offset MESS2
+[  68]    0123: B4 09                                 MOV AH , 09H
+[  69]    0125: CD 21                                 INT 21H
+[  70]    0127: F4                                    HLT
+[  71]        :                                       
+[  72]    0128: BA 56 00                              Match: MOV DX , offset MESS3
+[  73]    012B: B4 09                                 MOV AH , 09H
+[  74]    012D: CD 21                                 INT 21H
+[  75]    012F: F4                                    HLT
+[  76]        :                                       
+[  77]        :                                       
+[  78]        :                                       
+[  79]    0130:                                       CAL_PRINT PROC NEAR
+[  80]        :                                       
+[  81]        :                                       ; AH=0 AL=213
+[  82]        :                                       
+[  83]    0130: 2A E4                                 SUB AH , AH
+[  84]    0132: A0 02 00                              MOV AL , Guess_BIN
+[  85]    0135: B3 0A                                 MOV BL , 10
+[  86]    0137: F6 F3                                 DIV BL                  ; AL contaisn Guess_BIN / 10
+[  87]    0139: 88 26 05 00                           MOV Guess_ASC[2] , AH   ; AH contains Guess_BIN % 10
+[  88]        :                                       
+[  89]        :                                       ; AH=3 AL=21
+[  90]        :                                       
+[  91]    013D: 2A E4                                 SUB AH , AH
+[  92]    013F: B3 0A                                 MOV BL , 10
+[  93]    0141: F6 F3                                 DIV BL                  ; AL contains ( Guess_BIN/10 ) / 10
+[  94]    0143: 88 26 04 00                           MOV Guess_ASC[1] , AH   ; AH contains ( Guess_BIN/10 ) % 10
+[  95]        :                                       
+[  96]        :                                       ; AH=1 AL=2
+[  97]        :                                       
+[  98]    0147: 2A E4                                 SUB AH , AH
+[  99]    0149: A0 02 00                              MOV AL , Guess_BIN
+[ 100]    014C: B3 64                                 MOV BL , 100
+[ 101]    014E: F6 F3                                 DIV BL                  ; AL contains ( ( Guess_BIN/10 ) / 10 ) / 10
+[ 102]    0150: 88 26 03 00                           MOV Guess_ASC[0] , AH   ; AH contains ( ( Guess_BIN/10 ) / 10 ) % 10
+[ 103]        :                                       
+[ 104]        :                                       ; AH=2 AL=0
+[ 105]        :                                       
+[ 106]    0154: 80 06 05 00 30                        ADD Guess_ASC[2] , 30H
+[ 107]    0159: 80 06 04 00 30                        ADD Guess_ASC[1] , 30H
+[ 108]    015E: 80 06 03 00 30                        ADD Guess_ASC[0] , 30H
+[ 109]        :                                       
+[ 110]    0163: BA 03 00                              MOV DX , offset Guess_ASC
+[ 111]    0166: B4 09                                 MOV AH , 09H
+[ 112]    0168: CD 21                                 INT 21H
+[ 113]        :                                       
+[ 114]    016A: C3                                    RET
+[ 115]        :                                       
+[ 116]        :                                       CAL_PRINT ENDP
+[ 117]        :                                       
+[ 118]        :                                       
+[ 119]        :                                       
+[ 120]        :                                       CODE ENDS
+[ 121]        :                                       
+[ 122]        :                                       END START
+[ 123]        :                                       
+ 
+===================================================================================================
+ 
+EXE HEADER - bytes from 0000 to 01FF inclusive.
+
+0000: 4D      -   exe signature (M)
+0001: 5A      -   exe signature (Z)
+0002: 6B      -   bytes on last page (l.byte)
+0003: 01      -   bytes on last page (h.byte)
+0004: 02      -   512 byte pages in file (l.byte)
+0005: 00      -   512 byte pages in file (h.byte)
+0006: 02      -   relocations (l.byte)
+0007: 00      -   relocations (h.byte)
+0008: 20      -   paragraphs in header (l.byte)
+0009: 00      -   paragraphs in header (h.byte)
+000A: 00      -   minimum memory (l.byte)
+000B: 00      -   minimum memory (h.byte)
+000C: FF      -   maximum memory (l.byte)
+000D: FF      -   maximum memory (h.byte)
+000E: 07      -   SS - stack segment (l.byte)
+000F: 00      -   SS - stack segment (h.byte)
+0010: 64      -   SP - stack pointer (l.byte)
+0011: 00      -   SP - stack pointer (h.byte)
+0012: 03      -   check sum (l.byte)
+0013: 61      -   check sum (h.byte)
+0014: 0A      -   IP - instruction pointer (l.byte)
+0015: 00      -   IP - instruction pointer (h.byte)
+0016: 0E      -   CS - code segment (l.byte)
+0017: 00      -   CS - code segment (h.byte)
+0018: 1E      -   relocation table adress (l.byte)
+0019: 00      -   relocation table adress (h.byte)
+001A: 00      -   overlay number (l.byte)
+001B: 00      -   overlay number (h.byte)
+001C: 01      -   signature (l.byte)
+001D: 00      -   signature (h.byte)
+001E: 01      -   relocation table - offset inside segment (l.byte)
+001F: 00      -   relocation table - offset inside segment (h.byte)
+0020: 0E      -   relocation table - segment anchor (l.byte)
+0021: 00      -   relocation table - segment anchor (h.byte)
+0022: 06      -   relocation table - offset inside segment (l.byte)
+0023: 00      -   relocation table - offset inside segment (h.byte)
+0024: 0E      -   relocation table - segment anchor (l.byte)
+0025: 00      -   relocation table - segment anchor (h.byte)
+0026 to 01FF  -   reserved relocation area  (00) 
+
+
+
+
+===================================================================================================
